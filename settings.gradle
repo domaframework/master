@@ -1,0 +1,4 @@
+rootProject.name = 'master'
+
+includeFlat 'doma', 'doma-it', 'doma-gen', 'doma-gen-it', 'simple-boilerplate', 'simple-examples'
+

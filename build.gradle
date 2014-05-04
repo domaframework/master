@@ -1,0 +1,57 @@
+ext.masterVersion = '2.0-beta-5-SNAPSHOT'
+ext.encoding = 'UTF-8'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:gradle-git:0.8.0'
+    }
+}
+
+subprojects {
+    apply plugin: 'groovy'
+
+    ant.replaceregexp(
+        match: /(version = ')[^']*(')/,
+        replace: "\\1${masterVersion}\\2",
+        encoding: encoding,
+        flags: 'g') {
+            fileset(dir: project.projectDir) {
+                include(name: 'build.gradle')
+            }
+        }
+
+    task gitCommit(dependsOn: [clean, build]) << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        if (version.endsWith('-SNAPSHOT')) {
+            grgit.checkout(branch: 'master')
+            grgit.add(patterns: ['.'], update: true)
+            grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start")
+        } else {
+            grgit.checkout(branch: "${version}-release", createBranch: true)
+            grgit.add(patterns: ['.'], update: true)
+            grgit.commit(message: "${version} released")
+            grgit.tag.add(name: version)
+        }
+    }
+
+    task gitPush << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.push()
+    }
+
+    task gitReset << {
+        def revision = project.hasProperty('revision') ? project.revision : 'FETCH_HEAD'
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
+    }
+
+    build.mustRunAfter clean
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+
