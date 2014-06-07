@@ -1,4 +1,4 @@
-ext.masterVersion = '2.0-beta-5-SNAPSHOT'
+ext.masterVersion = '2.0.0-SNAPSHOT'
 ext.encoding = 'UTF-8'
 
 buildscript {
@@ -25,7 +25,7 @@ subprojects {
             }
     }
 
-    task gitCommit(dependsOn: [replaceVersion, clean, build]) << {
+    task gitCommit(dependsOn: [clean, build]) << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
         if (version.endsWith('-SNAPSHOT')) {
             grgit.checkout(branch: 'master')
@@ -46,6 +46,7 @@ subprojects {
     task gitPush << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
         grgit.push()
+        grgit.push(tags: true)
     }
 
     task gitReset << {
