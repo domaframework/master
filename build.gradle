@@ -13,17 +13,19 @@ buildscript {
 subprojects {
     apply plugin: 'groovy'
 
-    ant.replaceregexp(
-        match: /(version = ')[^']*(')/,
-        replace: "\\1${masterVersion}\\2",
-        encoding: encoding,
-        flags: 'g') {
-            fileset(dir: project.projectDir) {
-                include(name: 'build.gradle')
+    task replaceVersion << {
+        ant.replaceregexp(
+            match: /(version = ')[^']*(')/,
+            replace: "\\1${masterVersion}\\2",
+            encoding: encoding,
+            flags: 'g') {
+                fileset(dir: project.projectDir) {
+                    include(name: 'build.gradle')
+                }
             }
-        }
+    }
 
-    task gitCommit(dependsOn: [clean, build]) << {
+    task gitCommit(dependsOn: [replaceVersion, clean, build]) << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
         if (version.endsWith('-SNAPSHOT')) {
             grgit.checkout(branch: 'master')
@@ -48,6 +50,7 @@ subprojects {
         grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
     }
 
+    clean.mustRunAfter replaceVersion
     build.mustRunAfter clean
 }
 
