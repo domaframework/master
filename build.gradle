@@ -35,8 +35,12 @@ subprojects {
             grgit.checkout(branch: "${version}-release", createBranch: true)
             grgit.add(patterns: ['.'], update: true)
             grgit.commit(message: "${version} released")
-            grgit.tag.add(name: version)
         }
+    }
+
+    task gitTag << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.tag.add(name: version)
     }
 
     task gitPush << {
