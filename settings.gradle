@@ -1,4 +1,11 @@
 rootProject.name = 'master'
 
-includeFlat 'doma', 'doma-it', 'doma-gen', 'doma-gen-it', 'simple-boilerplate', 'simple-examples'
+includeFlat 'doma'
+includeFlat 'doma-it'
+includeFlat 'doma-gen'
+includeFlat 'doma-gen-it'
+includeFlat 'simple-boilerplate'
+includeFlat 'simple-examples'
+includeFlat 'spring-boot-sample'
+includeFlat 'spring-boot-jpetstore'
 
