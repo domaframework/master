@@ -1,4 +1,4 @@
-ext.masterVersion = '2.0.0-SNAPSHOT'
+ext.masterVersion = '2.0.0'
 ext.encoding = 'UTF-8'
 
 buildscript {
