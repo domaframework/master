@@ -1,4 +1,4 @@
-ext.masterVersion = '2.0.1'
+ext.masterVersion = '2.0.2-SNAPSHOT'
 ext.encoding = 'UTF-8'
 
 version = masterVersion
@@ -14,18 +14,6 @@ buildscript {
 
 allprojects {
     apply plugin: 'groovy'
-
-    task replaceVersion << {
-        ant.replaceregexp(
-            match: /(version = '2.0.1']*(')/,
-            replace: "\\1${masterVersion}\\2",
-            encoding: encoding,
-            flags: 'g') {
-                fileset(dir: project.projectDir) {
-                    include(name: 'build.gradle')
-                }
-            }
-    }
 
     task gitCommitDev(dependsOn: [clean, build]) << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
@@ -50,7 +38,7 @@ allprojects {
 
     task gitTag << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.tag.add(name: version)
+        grgit.tag.add(name: version, pointsTo: "${version}-release")
     }
 
     task gitPush << {
@@ -65,9 +53,27 @@ allprojects {
         grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
     }
 
-    clean.mustRunAfter replaceVersion
     build.mustRunAfter clean
 }
+
+subprojects {
+    apply plugin: 'groovy'
+
+    task replaceVersion << {
+        ant.replaceregexp(
+            match: /(version = ')[^']*(')/,
+            replace: "\\1${masterVersion}\\2",
+            encoding: encoding,
+            flags: 'g') {
+                fileset(dir: project.projectDir) {
+                    include(name: 'build.gradle')
+                }
+            }
+    }
+
+    clean.mustRunAfter replaceVersion
+}
+
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
