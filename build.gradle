@@ -1,5 +1,7 @@
-ext.masterVersion = '2.0.1-SNAPSHOT'
+ext.masterVersion = '2.0.1'
 ext.encoding = 'UTF-8'
+
+version = masterVersion
 
 buildscript {
     repositories {
@@ -10,12 +12,12 @@ buildscript {
     }
 }
 
-subprojects {
+allprojects {
     apply plugin: 'groovy'
 
     task replaceVersion << {
         ant.replaceregexp(
-            match: /(version = ')[^']*(')/,
+            match: /(version = '2.0.1']*(')/,
             replace: "\\1${masterVersion}\\2",
             encoding: encoding,
             flags: 'g') {
@@ -25,17 +27,25 @@ subprojects {
             }
     }
 
-    task gitCommit(dependsOn: [clean, build]) << {
+    task gitCommitDev(dependsOn: [clean, build]) << {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        if (version.endsWith('-SNAPSHOT')) {
-            grgit.checkout(branch: 'master')
-            grgit.add(patterns: ['.'], update: true)
-            grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start")
-        } else {
-            grgit.checkout(branch: "${version}-release", createBranch: true)
-            grgit.add(patterns: ['.'], update: true)
-            grgit.commit(message: "${version} released")
-        }
+        grgit.checkout(branch: 'master')
+        grgit.add(patterns: ['.'], update: true)
+        grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start")
+    }
+
+    task gitCommitRelease(dependsOn: [clean, build]) << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.checkout(branch: "${version}-release", createBranch: true)
+        grgit.add(patterns: ['.'], update: true)
+        grgit.commit(message: "${version} released")
+    }
+
+    task gitMergeReleaseBranch << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def releaseBranch = "${version}-release"
+        grgit.checkout(branch: 'master')
+        grgit.merge(head: releaseBranch, mode: org.ajoberstar.grgit.operation.MergeOp.Mode.CREATE_COMMIT)
     }
 
     task gitTag << {
