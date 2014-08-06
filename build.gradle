@@ -19,7 +19,7 @@ allprojects {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
         grgit.checkout(branch: 'master')
         grgit.add(patterns: ['.'], update: true)
-        grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start")
+        grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start. [ci skip]")
     }
 
     task gitCommitRelease(dependsOn: [clean, build]) << {
