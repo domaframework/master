@@ -1,4 +1,4 @@
-ext.masterVersion = '2.0.2-SNAPSHOT'
+ext.masterVersion = '2.1.0'
 ext.encoding = 'UTF-8'
 
 version = masterVersion
@@ -10,50 +10,6 @@ buildscript {
     dependencies {
         classpath 'org.ajoberstar:gradle-git:0.8.0'
     }
-}
-
-allprojects {
-    apply plugin: 'groovy'
-
-    task gitCommitDev(dependsOn: [clean, build]) << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.checkout(branch: 'master')
-        grgit.add(patterns: ['.'], update: true)
-        grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start. [ci skip]")
-    }
-
-    task gitCommitRelease(dependsOn: [clean, build]) << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.checkout(branch: "${version}-release", createBranch: true)
-        grgit.add(patterns: ['.'], update: true)
-        grgit.commit(message: "${version} released")
-    }
-
-    task gitMergeReleaseBranch << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        def releaseBranch = "${version}-release"
-        grgit.checkout(branch: 'master')
-        grgit.merge(head: releaseBranch, mode: org.ajoberstar.grgit.operation.MergeOp.Mode.CREATE_COMMIT)
-    }
-
-    task gitTag << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.tag.add(name: version, pointsTo: "${version}-release")
-    }
-
-    task gitPush << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.push()
-        grgit.push(tags: true)
-    }
-
-    task gitReset << {
-        def revision = project.hasProperty('revision') ? project.revision : 'FETCH_HEAD'
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
-        grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
-    }
-
-    build.mustRunAfter clean
 }
 
 subprojects {
@@ -71,9 +27,40 @@ subprojects {
             }
     }
 
-    clean.mustRunAfter replaceVersion
-}
+    task gitCommitDev(dependsOn: [clean, build]) << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.checkout(branch: 'master')
+        grgit.add(patterns: ['.'], update: true)
+        grgit.commit(message: "${version.replace('-SNAPSHOT', '')} dev start. [ci skip]")
+    }
 
+    task gitReset << {
+        def revision = project.hasProperty('revision') ? project.revision : 'origin/HEAD'
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
+        grgit.checkout(branch: 'master')
+        grgit.branch.remove(names: ["${masterVersion}-release"])
+        grgit.branch.remove(names: ["${masterVersion}-release"])
+        grgit.tag.remove(names: [masterVersion])
+    }
+
+    task gitCheckout << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.checkout(branch: "${masterVersion}-release", createBranch: true)
+        tasks.replaceVersion.execute();
+    }
+
+    task gitRelease(dependsOn: [clean, build]) << {
+        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        grgit.add(patterns: ['.'], update: true)
+        grgit.commit(message: "${masterVersion} released")
+        grgit.tag.add(name: masterVersion, pointsTo: "${masterVersion}-release")
+        grgit.push()
+        grgit.push(tags: true)
+    }
+
+    build.mustRunAfter clean
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
