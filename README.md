@@ -30,6 +30,12 @@ build.gradle の `masterVersion` を変更する（SNAPSHOTを外す）。
 ./gradlew gitPrepareRelease --stacktrace
 ```
 
+次のタスクを実行する。
+
+```sh
+./gradlew build
+```
+
 リリースノートを更新する。
 
 次のタスクを実行する。
@@ -63,6 +69,12 @@ build.gradle の `masterVersion` を変更する（バージョンを上げSNAPS
 
 ```sh
 ./gradlew gitPrepareDev --stacktrace
+```
+
+次のタスクを実行する。
+
+```sh
+./gradlew build
 ```
 
 次のタスクを実行する。
