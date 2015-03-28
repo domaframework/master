@@ -33,7 +33,7 @@ build.gradle の `masterVersion` を変更する（SNAPSHOTを外す）。
 次のタスクを実行する。
 
 ```sh
-./gradlew build
+./gradlew clean build
 ```
 
 リリースノートを更新する。
@@ -74,7 +74,7 @@ build.gradle の `masterVersion` を変更する（バージョンを上げSNAPS
 次のタスクを実行する。
 
 ```sh
-./gradlew build
+./gradlew clean build
 ```
 
 次のタスクを実行する。
