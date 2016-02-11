@@ -1,4 +1,4 @@
-ext.masterVersion = '2.6.2-SNAPSHOT'
+ext.masterVersion = '2.6.2'
 ext.encoding = 'UTF-8'
 
 version = masterVersion
