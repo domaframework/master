@@ -1,4 +1,5 @@
 ext.masterVersion = '2.15.1-SNAPSHOT'
+ext.masterDependentVersion = '2.15.0'
 ext.encoding = 'UTF-8'
 
 version = masterVersion
@@ -27,6 +28,18 @@ subprojects {
             }
     }
 
+    task replaceDependentVersion << {
+        ant.replaceregexp(
+            match: /(ext\.dependentVersion = ')[^']*(')/,
+            replace: "\\1${masterDependentVersion}\\2",
+            encoding: encoding,
+            flags: 'g') {
+                fileset(dir: project.projectDir) {
+                    include(name: 'build.gradle')
+                }
+            }
+    }
+
     task gitReset << {
         def revision = project.hasProperty('revision') ? project.revision : 'origin/HEAD'
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
@@ -43,6 +56,7 @@ subprojects {
         grgit.fetch()
         grgit.merge(head: 'origin/HEAD', mode: org.ajoberstar.grgit.operation.MergeOp.Mode.ONLY_FF)
         tasks.replaceVersion.execute();
+        tasks.replaceDependentVersion.execute();
     }
 
     task gitDev(dependsOn: [clean, build]) << {
@@ -56,6 +70,7 @@ subprojects {
         def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
         grgit.checkout(branch: "${masterVersion}-release", createBranch: true)
         tasks.replaceVersion.execute();
+        tasks.replaceDependentVersion.execute();
     }
 
     task gitRelease(dependsOn: [clean, build]) << {
