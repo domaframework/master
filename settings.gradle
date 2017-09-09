@@ -7,5 +7,4 @@ includeFlat 'doma-gen-it'
 includeFlat 'simple-boilerplate'
 includeFlat 'simple-examples'
 includeFlat 'spring-boot-sample'
-includeFlat 'spring-boot-jpetstore'
 
