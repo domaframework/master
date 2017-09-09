@@ -22,7 +22,7 @@ git clone しておく。
 リリース手順
 -------------
 
-build.gradle の `masterVersion` を変更する（SNAPSHOTを外す）。
+build.gradle の `masterVersion` と `masterDependentVersion` を変更する（SNAPSHOTを外しリリースしたいバージョンを指定する）。
 
 次のタスクを実行する。
 
