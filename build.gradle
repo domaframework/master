@@ -6,10 +6,10 @@ version = masterVersion
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath 'org.ajoberstar:gradle-git:0.8.0'
+        classpath 'org.ajoberstar:grgit:2.1.1'
     }
 }
 
@@ -42,7 +42,7 @@ subprojects {
 
     task gitReset << {
         def revision = project.hasProperty('revision') ? project.revision : 'origin/HEAD'
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
         grgit.reset(commit: revision,  mode: org.ajoberstar.grgit.operation.ResetOp.Mode.HARD)
         grgit.checkout(branch: 'master')
         grgit.branch.remove(names: ["${masterVersion}-release"])
@@ -51,7 +51,7 @@ subprojects {
     }
 
     task gitPrepareDev << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
         grgit.checkout(branch: 'master')
         grgit.fetch()
         grgit.merge(head: 'origin/HEAD', mode: org.ajoberstar.grgit.operation.MergeOp.Mode.ONLY_FF)
@@ -60,21 +60,21 @@ subprojects {
     }
 
     task gitDev(dependsOn: [clean, build]) << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
         grgit.add(patterns: ['.'], update: true)
         grgit.commit(message: 'Next development version [ci skip]')
         grgit.push()
     }
 
     task gitPrepareRelease << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
         grgit.checkout(branch: "${masterVersion}-release", createBranch: true)
         tasks.replaceVersion.execute();
         tasks.replaceDependentVersion.execute();
     }
 
     task gitRelease(dependsOn: [clean, build]) << {
-        def grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+        def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
         grgit.add(patterns: ['.'], update: true)
         grgit.commit(message: "${masterVersion} released")
         grgit.tag.add(name: masterVersion, pointsTo: "${masterVersion}-release")
