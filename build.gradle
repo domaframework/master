@@ -34,8 +34,8 @@ subprojects {
             grgit.checkout(branch: 'master')
             grgit.fetch()
             grgit.merge(head: 'origin/HEAD', mode: org.ajoberstar.grgit.operation.MergeOp.Mode.ONLY_FF)
-            replaceVersion();
-            replaceDependentVersion();            
+            replaceVersion(project);
+            replaceDependentVersion(project);            
         }
     }
 
@@ -52,8 +52,8 @@ subprojects {
         doLast {
             def grgit = org.ajoberstar.grgit.Grgit.open(dir: project.projectDir)
             grgit.checkout(branch: "${masterVersion}-release", createBranch: true)
-            replaceVersion();
-            replaceDependentVersion();            
+            replaceVersion(project);
+            replaceDependentVersion(project);            
         }
     }
 
@@ -71,7 +71,7 @@ subprojects {
     build.mustRunAfter clean
 }
 
-def replaceVersion() {
+def replaceVersion(project) {
     ant.replaceregexp(
         match: /(version = ')[^']*(')/,
         replace: "\\1${masterVersion}\\2",
@@ -83,7 +83,7 @@ def replaceVersion() {
         }
 }
 
-def replaceDependentVersion() {
+def replaceDependentVersion(project) {
     ant.replaceregexp(
         match: /(ext\.dependentVersion = ')[^']*(')/,
         replace: "\\1${masterDependentVersion}\\2",
