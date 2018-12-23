@@ -27,7 +27,7 @@ build.gradle の `masterVersion` と `masterDependentVersion` を変更する（
 次のタスクを実行する。
 
 ```sh
-./gradlew gitPrepareRelease --stacktrace
+./gradlew gitPrepareRelease --info
 ```
 
 次のタスクを実行する。
@@ -41,7 +41,7 @@ build.gradle の `masterVersion` と `masterDependentVersion` を変更する（
 次のタスクを実行する。
 
 ```sh
-./gradlew gitRelease --stacktrace
+./gradlew gitRelease --info
 ```
 
 doma プロジェクトにてプルリクエストとマージを行う。
@@ -68,7 +68,7 @@ build.gradle の `masterVersion` を変更する（バージョンを上げSNAPS
 次のタスクを実行する。
 
 ```sh
-./gradlew gitPrepareDev --stacktrace
+./gradlew gitPrepareDev --info
 ```
 
 次のタスクを実行する。
@@ -80,7 +80,7 @@ build.gradle の `masterVersion` を変更する（バージョンを上げSNAPS
 次のタスクを実行する。
 
 ```sh
-./gradlew gitDev --stacktrace
+./gradlew gitDev --info
 ```
 
 master プロジェクトを commit、push する。
