@@ -1,4 +1,4 @@
-ext.masterVersion = '2.24.0'
+ext.masterVersion = '2.25.0-SNAPSHOT'
 ext.masterDependentVersion = '2.24.0'
 ext.encoding = 'UTF-8'
 
