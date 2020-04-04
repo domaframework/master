@@ -2,8 +2,6 @@ rootProject.name = 'master'
 
 includeFlat 'doma'
 includeFlat 'doma-it'
-includeFlat 'doma-gen'
-includeFlat 'doma-gen-it'
 includeFlat 'simple-boilerplate'
 includeFlat 'simple-examples'
 
